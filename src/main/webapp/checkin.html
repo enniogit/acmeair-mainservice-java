@@ -36,17 +36,17 @@
 			dojo.require("dijit.Dialog");
 			dojo.require("dijit.Toolbar");
 			dojo.require("dijit.Declaration");
-			
+
 			dojo.addOnLoad(pageLoaded);
-			
+
 		    function pageLoaded() {
 		    	updateLoggedInUserWelcome();
 		    	createAndStartGrid();
 		    }
-		    
+
 		    function createAndStartGrid() {
 		    	var grid, store, dataStore;
-		    	
+
 		    	dojo.xhrGet({
 					url: window.location.protocol+ '//' + window.location.host + "/booking/byuser/" + dojo.cookie("loggedinuser"),
 					handleAs: "json",
@@ -63,10 +63,10 @@
 					}
 		    	});
 		    }
-		    
-		    
-			
-			
+
+
+
+
 			function returnIfNotLoggedIn() {
 				var loggedinuser = dojo.cookie("loggedinuser");
 				if (loggedinuser == null) {
@@ -78,37 +78,37 @@
 
 			function cellclick(e) {
 				if (returnIfNotLoggedIn()) { return }
-				
+
 				var rowClicked = e.rowIndex;
-				
+
 				if (e.cellIndex != 2) {
 					return;
 				}
-				
+
 				var gridId = e.grid.id;
 				var grid = dijit.byId(gridId);
 				var lastSelectedIndex = getCurrentlySelectedIndexForGrid(gridId);
 				var itemClicked = grid.getItem(rowClicked);
-				
+
 				if (itemClicked.selected) {
 					return; // already selected
 				}
-				
+
 				itemClicked.selected = true;
-				
+
 				var lastClickedItem = lastSelectedIndex == -1 ? null : grid.getItem(lastSelectedIndex);
-				
+
 				if (lastClickedItem) {
 					delete lastClickedItem.selected;
 				}
-				
+
 				setCurrentlySelectedIndexForGrid(gridId, rowClicked);
-				
+
 				var store = grid.store;
 				store.close();
 				grid.setStore(store);
 			}
-			
+
 			function getCurrentlySelectedIndexForGrid(gridId) {
 				if (gridId == 'gridFlights') {
 					return selectedIndexForFlights;
@@ -117,16 +117,16 @@
 					console.error("wrong grid specified");
 				}
 			}
-			
+
 			function setCurrentlySelectedIndexForGrid(gridId, value) {
 				if (gridId == 'gridFlights') {
 					selectedIndexForFlights = value;
-				}				
+				}
 				else {
 					console.error("wrong grid specified");
 				}
 			}
-			
+
 			function formatSelected(data) {
 				if (data.selected) {
 					return SELECTED_MESSAGE;
@@ -135,27 +135,27 @@
 					return NOT_SELECTED_MESSAGE;
 				}
 			}
-			
+
 			function formatFlightNumnber(data) {
 				// TODO:  Why [0]?? Also, why can't I just put this path into the declarative table markup?
 				return data.flightSegmentId[0];
 			}
-			
+
 			function cancelBookings() {
 				if (returnIfNotLoggedIn()) { return }
 
 				var loggedinuser = dojo.cookie("loggedinuser");
-				
+
 				if (selectedIndexForFlights == -1) {
 					alert("please select a flight");
 					return;
 				}
 				var grid = dijit.byId("gridFlights");
 				var booking = grid.store.getValue(grid.getItem(selectedIndexForFlights), "_id");
-				
+
 				var xhrContent = { userid : loggedinuser }
 				xhrContent.number = booking;
-				
+
 				dojo.xhrPost({
 					content : xhrContent,
 					url : window.location.protocol+ '//' + window.location.host + '/booking/cancelbooking',
@@ -167,8 +167,8 @@
 						alert(response);
 					}
 				});
-			}	
-			
+			}
+
 			var SELECTED_MESSAGE = 'selected';
 			var NOT_SELECTED_MESSAGE = 'select ...';
 			var selectedIndexForFlights = -1;
@@ -234,14 +234,14 @@
 			<div id="toolbar5.account" data-dojo-type="dijit.form.Button" data-dojo-props='showLabel:true' onClick="window.location='profile.html'">Account</div>
 			<div id="toolbar5.support" data-dojo-type="dijit.form.Button" data-dojo-props='showLabel:true' onClick="window.location='support.html'">Support</div>
 		</div>
-		
+
 		<div class="content">
 			<table data-dojo-type="dojox.grid.DataGrid" id="gridFlights" style="height: 200px">
-				<script type="dojo/connect" event="onCellClick" args="e">cellclick(e)</script> 
+				<script type="dojo/connect" event="onCellClick" args="e">cellclick(e)</script>
 				<thead>
 					<tr>
 						<th field="flightId" width="100px">Flight</th>
-						<th field="dateOfBooking" formatter="dateFormatter" width="175px">Date Booked</th>
+						<th field="dateOfBooking" formatter="dateFormatter" width="175px">Data prenotazione</th>
 						<th field="_item" formatter="formatSelected" width="120px" value="Check In">Check In</th>
 					</tr>
 				</thead>
